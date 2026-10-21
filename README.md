@@ -11,7 +11,7 @@
 
 ## 配置
 
-所有简历内容集中在 `src/config/resume.ts`：
+所有简历内容集中在 `config/resume.ts`：
 
 - `site`：网站名称、浏览器标题与 SEO 描述
 - `profile`：姓名、职位、城市、联系方式与链接
@@ -43,11 +43,11 @@ pnpm start
 
 ## 简历问答
 
-- 前端组件：`src/components/chat/chat-widget.tsx`
-- 接口：`src/app/api/chat/route.ts`
-- 知识整理：`src/agent/knowledge.ts`
-- 回答规则：`src/agent/prompt.ts`
-- 模型接入：`src/agent/openrouter.ts`
+- 前端组件：`components/chat/chat-widget.tsx`
+- 接口：`app/api/chat/route.ts`
+- 知识整理：`agent/knowledge.ts`
+- 回答规则：`agent/prompt.ts`
+- 模型接入：`agent/openrouter.ts`
 
 接口只接受最近 8 条消息，单条最多 2000 字符，回复最多 600 tokens。当前使用内存限流，每个 IP 每分钟最多 15 次请求。
 
