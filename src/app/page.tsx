@@ -6,6 +6,8 @@ import { ContributionsSection } from '@/components/contributions-section'
 import { SkillsSection } from '@/components/skills-section'
 import { EducationSection } from '@/components/education-section'
 import { SiteFooter } from '@/components/site-footer'
+import { ChatWidget } from '@/components/chat/chat-widget'
+import { resumeConfig } from '@/config/resume'
 
 export default function Page() {
   return (
@@ -28,6 +30,7 @@ export default function Page() {
         </div>
       </main>
       <SiteFooter />
+      <ChatWidget contactEmail={resumeConfig.profile.email} />
     </div>
   )
 }
