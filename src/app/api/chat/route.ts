@@ -69,20 +69,21 @@ export async function POST(request: Request) {
   }
 
   const rawMessages = (body as { messages: unknown[] }).messages
-  if (
-    rawMessages.length === 0 ||
-    rawMessages.length > MAX_MESSAGES ||
-    !rawMessages.every(isChatMessage)
-  ) {
+  if (rawMessages.length === 0 || rawMessages.length > MAX_MESSAGES) {
     return errorResponse('消息格式不正确。', 400)
   }
 
-  const messages = rawMessages.slice(-MAX_HISTORY)
-  if (messages.at(-1)?.role !== 'user') {
+  const messages = rawMessages.filter(isChatMessage)
+  if (messages.length !== rawMessages.length) {
+    return errorResponse('消息格式不正确。', 400)
+  }
+
+  const history = messages.slice(-MAX_HISTORY)
+  if (history.at(-1)?.role !== 'user') {
     return errorResponse('最后一条消息必须来自访客。', 400)
   }
 
-  const totalLength = messages.reduce((total, message) => total + message.content.length, 0)
+  const totalLength = history.reduce((total, message) => total + message.content.length, 0)
   if (totalLength > MAX_TOTAL_LENGTH) {
     return errorResponse('消息内容过长。', 413)
   }
@@ -94,7 +95,7 @@ export async function POST(request: Request) {
   const result = streamText({
     model: getChatModel(new URL(request.url).origin),
     instructions: SYSTEM_PROMPT,
-    messages,
+    messages: history,
     temperature: 0.3,
     maxOutputTokens: 600,
     abortSignal: request.signal,

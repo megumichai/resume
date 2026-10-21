@@ -15,6 +15,11 @@ type ChatWidgetProps = {
 }
 
 const MAX_HISTORY = 8
+
+function createId() {
+  return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`
+}
+
 const STARTER_QUESTIONS = [
   '他做过哪些项目？',
   '他的技术栈是什么？',
@@ -33,6 +38,7 @@ export function ChatWidget({ contactEmail }: ChatWidgetProps) {
   const [input, setInput] = useState('')
   const [error, setError] = useState('')
   const [streaming, setStreaming] = useState(false)
+  const busyRef = useRef(false)
   const abortRef = useRef<AbortController | null>(null)
   const messagesRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -53,7 +59,7 @@ export function ChatWidget({ contactEmail }: ChatWidgetProps) {
   useEffect(() => {
     if (!open) return
 
-    function handleKeyDown(event: globalThis.KeyboardEvent) {
+    function handleKeyDown(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         setOpen(false)
         abortRef.current?.abort()
@@ -80,14 +86,16 @@ export function ChatWidget({ contactEmail }: ChatWidgetProps) {
 
   async function sendMessage(value: string) {
     const question = value.trim()
-    if (!question || streaming) return
+    if (!question || busyRef.current) return
+
+    busyRef.current = true
 
     const userMessage: ChatMessage = {
-      id: crypto.randomUUID(),
+      id: createId(),
       role: 'user',
       content: question,
     }
-    const assistantId = crypto.randomUUID()
+    const assistantId = createId()
     const nextMessages = [...messages, userMessage]
     const history = nextMessages.slice(-MAX_HISTORY)
 
@@ -152,6 +160,7 @@ export function ChatWidget({ contactEmail }: ChatWidgetProps) {
       )
       setError(caught instanceof Error ? caught.message : '问答服务暂时不可用，请稍后重试。')
     } finally {
+      busyRef.current = false
       abortRef.current = null
       setStreaming(false)
     }
