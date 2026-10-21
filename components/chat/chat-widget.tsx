@@ -314,7 +314,7 @@ export function ChatWidget({ contactEmail }: ChatWidgetProps) {
           <header className="flex items-center justify-between border-b border-border px-4 py-3">
             <div>
               <p id="resume-chat-title" className="text-sm font-semibold">
-                MCS小助手 (牛马豆包版)
+                MCS小助手 (豆包版)
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">基于简历内容回答</p>
             </div>

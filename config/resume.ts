@@ -48,6 +48,10 @@ export type ResumeConfig = {
     name: string
     title: string
     description: string
+    deploy?: {
+      name: string
+      url?: string
+    }
   }
   profile: {
     name: string
@@ -70,6 +74,10 @@ export const resumeConfig: ResumeConfig = {
     name: '我的简历',
     title: '我的简历 | 前端开发工程师',
     description: 'Megumi Chai的个人简历，包含个人优势、工作经历、项目经历与教育背景。',
+    deploy: {
+      name: 'Netlify',
+      url: 'https://www.netlify.com/',
+    },
   },
   profile: {
     name: 'Megumi Chai',
