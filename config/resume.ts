@@ -89,7 +89,7 @@ export const resumeConfig: ResumeConfig = {
     links: [
       {
         label: 'Demos',
-        href: 'http://whatmegumichaimade.vercel.app/',
+        href: 'http://whatmegumichaimade.netlify.app/',
       },
     ],
   },
