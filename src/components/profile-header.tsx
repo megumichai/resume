@@ -41,7 +41,7 @@ export function ProfileHeader() {
               </li>
             ) : null}
             {links.map((link) => (
-              <li key={link.href}>
+              <li data-no-print key={link.href}>
                 <a
                   href={link.href}
                   target="_blank"

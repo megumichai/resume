@@ -9,3 +9,9 @@ const container = document.getElementById('app')
 if (container) {
   render(<App />, container)
 }
+
+declare module 'preact' {
+  interface HTMLAttributes<RefType extends EventTarget = EventTarget> {
+    'data-no-print'?: boolean
+  }
+}
