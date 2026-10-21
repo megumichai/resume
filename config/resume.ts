@@ -55,6 +55,7 @@ export type ResumeConfig = {
   }
   profile: {
     name: string
+    gender?: 'male' | 'female'
     role: string
     location: string
     email: string
@@ -81,6 +82,7 @@ export const resumeConfig: ResumeConfig = {
   },
   profile: {
     name: 'Megumi Chai',
+    gender: 'male',
     role: '前端开发工程师',
     location: '中国 · 广州',
     email: 'megumichaix@foxmail.com',

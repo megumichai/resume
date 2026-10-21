@@ -16,6 +16,15 @@ export function ProfileHeader() {
         <div>
           <h1 className="text-3xl font-medium leading-none tracking-tight md:text-4xl">
             {profile.name}
+            {profile.gender ? (
+              <span
+                role="img"
+                aria-label={profile.gender === 'male' ? '男性' : '女性'}
+                className={`ml-1.5 align-baseline text-base ${profile.gender === 'male' ? 'text-blue-500' : 'text-pink-500'}`}
+              >
+                {profile.gender === 'male' ? '♂' : '♀'}
+              </span>
+            ) : null}
           </h1>
           <p className="mt-3 text-sm">
             {profile.role}
