@@ -7,7 +7,7 @@ import { SkillsSection } from '@/components/skills-section'
 import { EducationSection } from '@/components/education-section'
 import { SiteFooter } from '@/components/site-footer'
 
-export function App() {
+export default function Page() {
   return (
     <div className="flex min-h-screen flex-col">
       <SiteHeader />

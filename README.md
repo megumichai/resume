@@ -1,6 +1,6 @@
 # 简历网站
 
-基于 Vite、Preact 与 Tailwind CSS 的单页简历网站。
+基于 Next.js、React 与 Tailwind CSS 的单页简历网站。
 
 ## 配置
 
@@ -21,13 +21,13 @@ pnpm install
 pnpm dev
 ```
 
-访问 `http://localhost:5173`。
+访问 `http://localhost:3000`。
 
 ## 构建
 
 ```bash
 pnpm build
-pnpm preview
+pnpm start
 ```
 
 页面右上角支持明暗主题切换和打印 / 导出 PDF。

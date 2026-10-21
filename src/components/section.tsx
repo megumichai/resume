@@ -1,9 +1,9 @@
-import type { ComponentChildren } from 'preact'
+import type { ReactNode } from 'react'
 
 type SectionProps = {
   id: string
   title: string
-  children: ComponentChildren
+  children: ReactNode
 }
 
 export function Section({ id, title, children }: SectionProps) {

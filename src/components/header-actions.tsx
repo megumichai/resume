@@ -1,3 +1,5 @@
+'use client'
+
 import { MoonIcon, PrinterIcon, SunIcon } from '@/components/icons'
 
 const buttonClassName =
