@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent, KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { CloseIcon, MessageIcon, RotateCcwIcon, SendIcon, StopIcon } from '@/components/icons'
+import { CloseIcon, RotateCcwIcon, SendIcon, StopIcon } from '@/components/icons'
+import { CHAT_PET_MOVE_EVENT, CHAT_TOGGLE_EVENT, type PetRect } from '@/components/chat/chat-events'
 
 type ChatMessage = {
   id: string
@@ -32,12 +33,65 @@ const iconButtonClassName =
 const primaryButtonClassName =
   'grid size-9 shrink-0 place-items-center rounded-md bg-foreground text-background outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:opacity-40'
 
+type ViewportSize = {
+  width: number
+  height: number
+}
+
+type PanelLayout = {
+  left: number
+  top: number
+  width: number
+  height: number
+}
+
+function getPanelLayout(pet: PetRect | null, viewport: ViewportSize): PanelLayout {
+  const margin = 16
+  const gap = 12
+  const width = Math.min(352, Math.max(0, viewport.width - margin * 2))
+  const maxHeight = Math.min(480, Math.max(0, viewport.height - margin * 2))
+
+  if (!pet || width === 0 || maxHeight === 0) {
+    return {
+      left: Math.max(margin, viewport.width - width - margin),
+      top: Math.max(margin, viewport.height - maxHeight - margin),
+      width,
+      height: maxHeight,
+    }
+  }
+
+  let left = pet.left + pet.width - width
+  left = Math.max(margin, Math.min(left, viewport.width - margin - width))
+
+  const spaceAbove = pet.top - gap - margin
+  const spaceBelow = viewport.height - pet.top - pet.height - gap - margin
+  const fitsAbove = spaceAbove >= maxHeight
+  const fitsBelow = spaceBelow >= maxHeight
+  const placeAbove = fitsAbove || (!fitsBelow && spaceAbove >= spaceBelow)
+  let height = maxHeight
+
+  if (!fitsAbove && !fitsBelow) {
+    height = Math.min(maxHeight, Math.max(200, Math.max(spaceAbove, spaceBelow)))
+  }
+
+  let top = placeAbove ? pet.top - height - gap : pet.top + pet.height + gap
+  top = Math.max(margin, Math.min(top, viewport.height - margin - height))
+
+  return { left, top, width, height }
+}
+
 export function ChatWidget({ contactEmail }: ChatWidgetProps) {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
   const [error, setError] = useState('')
   const [streaming, setStreaming] = useState(false)
+  const [petRect, setPetRect] = useState<PetRect | null>(null)
+  const [viewport, setViewport] = useState<ViewportSize>(() =>
+    typeof window === 'undefined'
+      ? { width: 0, height: 0 }
+      : { width: window.innerWidth, height: window.innerHeight },
+  )
   const busyRef = useRef(false)
   const abortRef = useRef<AbortController | null>(null)
   const messagesRef = useRef<HTMLDivElement>(null)
@@ -69,6 +123,39 @@ export function ChatWidget({ contactEmail }: ChatWidgetProps) {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [open])
+
+  useEffect(() => {
+    function handleToggle() {
+      if (open) {
+        setOpen(false)
+        abortRef.current?.abort()
+      } else {
+        setOpen(true)
+      }
+    }
+
+    window.addEventListener(CHAT_TOGGLE_EVENT, handleToggle)
+    return () => window.removeEventListener(CHAT_TOGGLE_EVENT, handleToggle)
+  }, [open])
+
+  useEffect(() => {
+    function handlePetMove(event: Event) {
+      setPetRect((event as CustomEvent<PetRect>).detail)
+    }
+
+    window.addEventListener(CHAT_PET_MOVE_EVENT, handlePetMove)
+    return () => window.removeEventListener(CHAT_PET_MOVE_EVENT, handlePetMove)
+  }, [])
+
+  useEffect(() => {
+    function updateViewport() {
+      setViewport({ width: window.innerWidth, height: window.innerHeight })
+    }
+
+    updateViewport()
+    window.addEventListener('resize', updateViewport)
+    return () => window.removeEventListener('resize', updateViewport)
+  }, [])
 
   useEffect(() => {
     return () => {
@@ -195,20 +282,39 @@ export function ChatWidget({ contactEmail }: ChatWidgetProps) {
   }
 
   const lastMessage = messages[messages.length - 1]
+  const panelLayout = getPanelLayout(petRect, viewport)
 
   return (
-    <div data-no-print className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+    <>
+      <div data-no-print className="fixed bottom-5 right-5 z-[1001]">
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-expanded={open}
+          aria-controls="resume-chat-panel"
+          className="sr-only focus:not-sr-only focus:rounded-md focus:border focus:border-border focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+        >
+          打开简历问答
+        </button>
+      </div>
       {open ? (
         <section
           id="resume-chat-panel"
           role="dialog"
           aria-labelledby="resume-chat-title"
-          className="flex h-[30rem] max-h-[calc(100dvh_-_7rem)] w-[22rem] max-w-[calc(100vw_-_2.5rem)] flex-col overflow-hidden rounded-xl border border-border bg-background shadow-xl"
+          data-no-print
+          style={{
+            left: panelLayout.left,
+            top: panelLayout.top,
+            width: panelLayout.width,
+            height: panelLayout.height,
+          }}
+          className="fixed z-[1001] flex flex-col overflow-hidden rounded-xl border border-border bg-background shadow-xl"
         >
           <header className="flex items-center justify-between border-b border-border px-4 py-3">
             <div>
               <p id="resume-chat-title" className="text-sm font-semibold">
-                简历问答
+                MCS小助手 (牛马豆包版)
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">基于简历内容回答</p>
             </div>
@@ -354,18 +460,6 @@ export function ChatWidget({ contactEmail }: ChatWidgetProps) {
           </form>
         </section>
       ) : null}
-
-      <button
-        type="button"
-        onClick={open ? closePanel : () => setOpen(true)}
-        aria-label={open ? '关闭简历问答' : '打开简历问答'}
-        aria-expanded={open}
-        aria-controls="resume-chat-panel"
-        title={open ? '关闭问答' : '向 AI 提问简历'}
-        className="grid size-12 place-items-center rounded-full bg-foreground text-background shadow-lg outline-none transition-transform hover:scale-105 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-      >
-        {open ? <CloseIcon className="size-5" /> : <MessageIcon className="size-5" />}
-      </button>
-    </div>
+    </>
   )
 }

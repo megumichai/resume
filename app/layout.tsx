@@ -4,6 +4,7 @@ import '@fontsource-variable/inter'
 import '@fontsource-variable/noto-serif'
 import './globals.css'
 import { resumeConfig } from '@/config/resume'
+import { CodexPet } from '@/components/codex-pet'
 
 export const metadata: Metadata = {
   title: resumeConfig.site.title,
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         {children}
+        <CodexPet />
       </body>
     </html>
   )
