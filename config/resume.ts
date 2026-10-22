@@ -91,7 +91,7 @@ export const resumeConfig: ResumeConfig = {
     links: [
       {
         label: 'Demos',
-        href: 'http://whatmegumichaimade.netlify.app/',
+        href: 'http://mcsmade.netlify.app/',
       },
     ],
   },
