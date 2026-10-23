@@ -72,6 +72,10 @@ export function ProfileHeader() {
           ) : null}
         </div>
       </div>
+
+      {profile.summary ? (
+        <p className="mt-5 max-w-3xl text-sm leading-6">{profile.summary}</p>
+      ) : null}
     </section>
   )
 }
